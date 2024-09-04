@@ -203,51 +203,51 @@ int options_page() {
       switch (option_selected) {
         case PAGE_CHNA:
           lcd.setCursor(1,0);
-          lcd.print(F("  CHANNEL A"));
+          lcd.print(F("  CHANNEL A  "));
           lcd.setCursor(0,1);
           lcd.print(F(" RF MW-VHF O/P"));
           break;
 
         case PAGE_CHNB:
           lcd.setCursor(1,0);
-          lcd.print(F("  CHANNEL B"));
+          lcd.print(F("  CHANNEL B  "));
           lcd.setCursor(0,1);
           lcd.print(F(" RF MW-VHF O/P"));
           break;
 
         case PAGE_CHNC:
           lcd.setCursor(1,0);
-          lcd.print(F("  CHANNEL C"));
+          lcd.print(F("  CHANNEL C  "));
           lcd.setCursor(0,1);
-          lcd.print(F(" PWM 0-MW O/P"));
+          lcd.print(F(" PWM 0-MW O/P "));
           break;
         
         case PAGE_CHND:
           lcd.setCursor(1,0);
-          lcd.print(F("  CHANNEL D"));
+          lcd.print(F("  CHANNEL D  "));
           lcd.setCursor(0,1);
-          lcd.print(F(" PWM 0-MW O/P"));
+          lcd.print(F(" PWM 0-MW O/P "));
           break;
 
         case PAGE_SWEP:
           lcd.setCursor(1,0);
-          lcd.print(F("  Sweep"));
+          lcd.print(F("  Sweep    "));
           lcd.setCursor(0,1);
-          lcd.print(F(" Freq Sweeper"));
+          lcd.print(F(" Freq Sweeper  "));
           break;
 
         case PAGE_PROG:
           lcd.setCursor(1,0);
-          lcd.print(F("  Prog mode"));
+          lcd.print(F("  Prog mode  "));
           lcd.setCursor(0,1);
           lcd.print(F(" Prog using i2c"));
           break;
         
         case PAGE_SET:
           lcd.setCursor(1,0);
-          lcd.print(F("  Options"));
+          lcd.print(F("  Options   "));
           lcd.setCursor(0,1);
-          lcd.print(F(" More Settings"));
+          lcd.print(F(" More Settings "));
           break;
 
 
@@ -275,7 +275,7 @@ void setup() {
   lcd.createChar(BACK_MENU, back_menu);
 
 
-
+  lcd.setCursor(0, 0);
   lcd.print(F("  RF Generator "));
   lcd.setCursor(0, 1);
   lcd.print(F(" v1.15 <Surya>"));
