@@ -1,0 +1,60 @@
+1   2   3   4   5
+RX  RST TX SCL SDA
+
+atmega
+
+RS - 8
+Enable - 7
+d7 - 2
+d6 - 4
+d5 - 5
+d4 - 6
+
+9 - bias
+A3 - buzz
+
+
+3 - pwm1
+10 - pwm2
+
+A2,A1,A0
+11,12,13
+
+---- ALL PINS USED --------
+
+LCD_RS  - 
+LCD_E  - 
+LCD_D4  - 
+LCD_D5  - 
+LCD_D6  - 
+LCD_D7  - 
+CLK 
+DT
+SW
+CLK
+DT
+SW
+WAV1
+WAV2
+BIASSWITCH
+SCL - 
+SDA - 
+BUZZER
+0 - RX
+1 - TX
+<-ADD->
+TWO MORE switch
+
+
+-> Total - 20
+
+##PRGRAMMER PINS##
+RX
+RST
+TX
+SCL
+SDA
+
+LCD R/W  - ground
+LCD VSS  - ground
+LCD VDD  - 5V
