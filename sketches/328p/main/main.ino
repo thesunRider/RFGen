@@ -159,15 +159,33 @@ byte bias_char[] = {
 #define PAGE_PROG 5
 #define PAGE_SET 6
 
+#define SELECT_SW 0
+#define MODE_SW 1
 
+bool switch_sel_status = 0;
+bool switch_mode_status = 0;
+
+bool was_clicked(int switch_sel) {
+  int switch_temp_status;
+  if (switch_sel == SELECT_SW) {
+    switch_temp_status = switch_sel_status;
+    switch_sel_status = 0;
+  } else {
+    switch_temp_status = switch_mode_status;
+    switch_mode_status = 0;
+  }
+  return switch_temp_status;
+}
 
 void click_select(EButton &btn) {
+  switch_sel_status = 1;
   digitalWrite(BUZZ_PIN, HIGH);
   delay(buzz_duration);
   digitalWrite(BUZZ_PIN, LOW);
 }
 
 void click_mode(EButton &btn) {
+  switch_mode_status = 1;
   digitalWrite(BUZZ_PIN, HIGH);
   delay(buzz_duration);
   digitalWrite(BUZZ_PIN, LOW);
@@ -183,7 +201,7 @@ int options_page() {
   lcd.setCursor(15, 0);
   lcd.write(byte(RIGHT_OPT));
 
-  int option_selected = -1;
+  int option_selected = 0;
 
   lcd.setCursor(1, 0);
   lcd.print(F("  CHANNEL A"));
@@ -193,7 +211,7 @@ int options_page() {
   rot_select_button.tick();
   rot_mode_button.tick();
 
-  while (!rot_select_button.isButtonPressed()) {
+  while (!was_clicked(SELECT_SW)) {
     // put your main code here, to run repeatedly:
     unsigned char rselect_event = rselect.process();
     unsigned char rmode_event = rmode.process();
@@ -285,7 +303,7 @@ int options_page() {
 #define BACK_OPTION 4
 
 int lffreq_chna = 1000;
-
+float hffreq_chna = 1;
 void page_chnA() {
   delay(700);
   lcd.clear();
@@ -303,9 +321,10 @@ void page_chnA() {
   rot_select_button.tick();
   rot_mode_button.tick();
   int option_selected = -1;
+  int selected_character = 0;
 
 
-  while (!(rot_select_button.isButtonPressed() && option_selected == BACK_OPTION)) {
+  while (!(was_clicked(SELECT_SW) && option_selected == BACK_OPTION)) {
     // put your main code here, to run repeatedly:
     unsigned char rselect_event = rselect.process();
     unsigned char rmode_event = rmode.process();
@@ -318,6 +337,18 @@ void page_chnA() {
       digitalWrite(BUZZ_PIN, HIGH);
       delay(buzz_duration);
       digitalWrite(BUZZ_PIN, LOW);
+    }
+
+    if (was_clicked(MODE_SW) && option_selected == CHN_HFFREQ) {
+      ++selected_character;
+      if (selected_character==3)
+        ++selected_character;
+
+      if (selected_character > 5)
+        selected_character = 0;
+
+      lcd.setCursor(1 + selected_character, 1);
+      lcd.cursor();
     }
 
     if (rselect_event) {
@@ -348,6 +379,8 @@ void page_chnA() {
         case CHN_HFFREQ:
           lcd.setCursor(0, 1);
           lcd.write(byte(RIGHT_ARW));
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
           break;
 
         case CHN_ENABLE:
@@ -379,7 +412,7 @@ void page_chnA() {
       switch (option_selected) {
         case CHN_LFFREQ:
           lcd.setCursor(5, 0);
-          rmode_event == DIR_CW ? lffreq_chna+=10 : lffreq_chna-=10;
+          rmode_event == DIR_CW ? lffreq_chna += 10 : lffreq_chna -= 10;
           if (lffreq_chna < 0)
             lffreq_chna = 0;
           if (lffreq_chna > 9999)
@@ -390,8 +423,25 @@ void page_chnA() {
           break;
 
         case CHN_HFFREQ:
-          lcd.setCursor(0, 1);
-          lcd.write(byte(RIGHT_ARW));
+          lcd.setCursor(1, 1);
+          if (selected_character <= 2)
+            rmode_event == DIR_CW ? hffreq_chna += pow(10, (2 - selected_character)) : hffreq_chna -= pow(10, (2 - selected_character));
+          else
+            rmode_event == DIR_CW ? hffreq_chna += pow(10, (3 - selected_character)) : hffreq_chna -= pow(10, (3 - selected_character));
+          if (hffreq_chna < 0)
+            hffreq_chna = 0;
+          if (hffreq_chna > 999.99)
+            hffreq_chna = 999.99;
+
+          char hfreq_char[7];
+          dtostrf(hffreq_chna, 6, 2, hfreq_char);
+          for (int i = 0; i < 7; i++)
+            if (hfreq_char[i] == ' ')
+              hfreq_char[i] = '0';  // Replace space with zero
+
+          lcd.print(hfreq_char);
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
           break;
 
         case CHN_ENABLE:
@@ -457,7 +507,8 @@ void setup() {
   Si.init();
 
   rot_select_button.attachSingleClick(click_select);
-  rot_mode_button.attachDoubleClick(click_mode);
+  rot_mode_button.attachSingleClick(click_mode);
+
 
   delay(SPLASH_DELAY);
   digitalWrite(BUZZ_PIN, LOW);
