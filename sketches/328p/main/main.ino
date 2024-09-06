@@ -82,6 +82,7 @@ int buzz_duration = 30;
 #define RIGHT_ARW 2
 #define LEFT_ARW 3
 #define BACK_MENU 4
+#define BIAS_MENU 5
 
 byte left_options[] = {
   B00000,
@@ -138,6 +139,17 @@ byte back_menu[] = {
   B00000
 };
 
+byte bias_char[] = {
+  B00000,
+  B10000,
+  B10001,
+  B10000,
+  B11001,
+  B10101,
+  B11001,
+  B00000
+};
+
 #define NUM_PAGES 6
 #define PAGE_CHNA 0
 #define PAGE_CHNB 1
@@ -163,6 +175,7 @@ void click_mode(EButton &btn) {
 
 
 int options_page() {
+  delay(100);
   lcd.clear();
   lcd.noCursor();
   lcd.setCursor(0, 0);
@@ -170,13 +183,15 @@ int options_page() {
   lcd.setCursor(15, 0);
   lcd.write(byte(RIGHT_OPT));
 
-  int option_selected = PAGE_CHNA;
+  int option_selected = -1;
 
-  lcd.setCursor(1,0);
-          lcd.print(F("  CHANNEL A"));
-          lcd.setCursor(0,1);
-          lcd.print(F(" RF MW-VHF O/P"));
+  lcd.setCursor(1, 0);
+  lcd.print(F("  CHANNEL A"));
+  lcd.setCursor(0, 1);
+  lcd.print(F(" RF MW-VHF O/P"));
 
+  rot_select_button.tick();
+  rot_mode_button.tick();
 
   while (!rot_select_button.isButtonPressed()) {
     // put your main code here, to run repeatedly:
@@ -195,71 +210,215 @@ int options_page() {
 
     if (rselect_event) {
       rselect_event == DIR_CW ? option_selected++ : option_selected--;
-      if(option_selected < 0 )
+      if (option_selected < 0)
         option_selected = NUM_PAGES;
-      if(option_selected > NUM_PAGES)
-         option_selected = 0;
+      if (option_selected > NUM_PAGES)
+        option_selected = 0;
 
       switch (option_selected) {
         case PAGE_CHNA:
-          lcd.setCursor(1,0);
+          lcd.setCursor(1, 0);
           lcd.print(F("  CHANNEL A  "));
-          lcd.setCursor(0,1);
+          lcd.setCursor(0, 1);
           lcd.print(F(" RF MW-VHF O/P"));
           break;
 
         case PAGE_CHNB:
-          lcd.setCursor(1,0);
+          lcd.setCursor(1, 0);
           lcd.print(F("  CHANNEL B  "));
-          lcd.setCursor(0,1);
+          lcd.setCursor(0, 1);
           lcd.print(F(" RF MW-VHF O/P"));
           break;
 
         case PAGE_CHNC:
-          lcd.setCursor(1,0);
+          lcd.setCursor(1, 0);
           lcd.print(F("  CHANNEL C  "));
-          lcd.setCursor(0,1);
+          lcd.setCursor(0, 1);
           lcd.print(F(" PWM 0-MW O/P "));
           break;
-        
+
         case PAGE_CHND:
-          lcd.setCursor(1,0);
+          lcd.setCursor(1, 0);
           lcd.print(F("  CHANNEL D  "));
-          lcd.setCursor(0,1);
+          lcd.setCursor(0, 1);
           lcd.print(F(" PWM 0-MW O/P "));
           break;
 
         case PAGE_SWEP:
-          lcd.setCursor(1,0);
+          lcd.setCursor(1, 0);
           lcd.print(F("  Sweep    "));
-          lcd.setCursor(0,1);
+          lcd.setCursor(0, 1);
           lcd.print(F(" Freq Sweeper  "));
           break;
 
         case PAGE_PROG:
-          lcd.setCursor(1,0);
+          lcd.setCursor(1, 0);
           lcd.print(F("  Prog mode  "));
-          lcd.setCursor(0,1);
+          lcd.setCursor(0, 1);
           lcd.print(F(" Prog using i2c"));
           break;
-        
+
         case PAGE_SET:
-          lcd.setCursor(1,0);
+          lcd.setCursor(1, 0);
           lcd.print(F("  Options   "));
-          lcd.setCursor(0,1);
+          lcd.setCursor(0, 1);
           lcd.print(F(" More Settings "));
           break;
 
 
-        
+
         default:
           break;
       }
     }
   }
+  Serial.println(option_selected);
   return option_selected;
+}
+
+#define OPTIONS_CHNA 5
+#define CHN_LFFREQ 0
+#define CHN_HFFREQ 1
+#define CHN_ENABLE 2
+#define CHN_PWR 5
+#define CHN_BIAS 3
+#define BACK_OPTION 4
+
+int lffreq_chna = 1000;
+
+void page_chnA() {
+  delay(700);
+  lcd.clear();
+  lcd.noCursor();
+  lcd.setCursor(15, 1);
+  lcd.write(byte(BACK_MENU));
+  lcd.setCursor(13, 1);
+  lcd.write(byte(BIAS_MENU));
+
+  lcd.setCursor(0, 0);
+  lcd.print(F("CHNA 1000hz 2mA"));
+  lcd.setCursor(0, 1);
+  lcd.print(F(" 001.00Mhz E"));
+
+  rot_select_button.tick();
+  rot_mode_button.tick();
+  int option_selected = -1;
 
 
+  while (!(rot_select_button.isButtonPressed() && option_selected == BACK_OPTION)) {
+    // put your main code here, to run repeatedly:
+    unsigned char rselect_event = rselect.process();
+    unsigned char rmode_event = rmode.process();
+
+    rot_select_button.tick();
+    rot_mode_button.tick();
+
+    //play sound
+    if (rselect_event || rmode_event && buzz_duration > 0) {
+      digitalWrite(BUZZ_PIN, HIGH);
+      delay(buzz_duration);
+      digitalWrite(BUZZ_PIN, LOW);
+    }
+
+    if (rselect_event) {
+      rselect_event == DIR_CW ? option_selected++ : option_selected--;
+      if (option_selected < 0)
+        option_selected = OPTIONS_CHNA;
+      if (option_selected > OPTIONS_CHNA)
+        option_selected = 0;
+
+      lcd.noCursor();
+      lcd.setCursor(4, 0);
+      lcd.print(" ");
+      lcd.setCursor(0, 1);
+      lcd.print(" ");
+      lcd.setCursor(10, 1);
+      lcd.print(" ");
+      lcd.setCursor(12, 1);
+      lcd.print(" ");
+      lcd.setCursor(11, 0);
+      lcd.print(" ");
+
+      switch (option_selected) {
+        case CHN_LFFREQ:
+          lcd.setCursor(4, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_HFFREQ:
+          lcd.setCursor(0, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_ENABLE:
+          lcd.setCursor(10, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_PWR:
+          lcd.setCursor(11, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_BIAS:
+          lcd.setCursor(12, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case BACK_OPTION:
+          lcd.setCursor(15, 1);
+          lcd.cursor();
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    if (rmode_event) {
+      switch (option_selected) {
+        case CHN_LFFREQ:
+          lcd.setCursor(5, 0);
+          rmode_event == DIR_CW ? lffreq_chna+=10 : lffreq_chna-=10;
+          if (lffreq_chna < 0)
+            lffreq_chna = 0;
+          if (lffreq_chna > 9999)
+            lffreq_chna = 9999;
+          char lfreq_char[5];
+          sprintf(lfreq_char, "%04d", lffreq_chna);
+          lcd.print(lfreq_char);
+          break;
+
+        case CHN_HFFREQ:
+          lcd.setCursor(0, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_ENABLE:
+          lcd.setCursor(10, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_PWR:
+          lcd.setCursor(11, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_BIAS:
+          lcd.setCursor(12, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case BACK_OPTION:
+          lcd.setCursor(15, 1);
+          lcd.cursor();
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
 }
 
 void setup() {
@@ -273,6 +432,7 @@ void setup() {
   lcd.createChar(RIGHT_ARW, right_arrow);
   lcd.createChar(LEFT_ARW, left_arrow);
   lcd.createChar(BACK_MENU, back_menu);
+  lcd.createChar(BIAS_MENU, bias_char);
 
 
   lcd.setCursor(0, 0);
@@ -309,5 +469,18 @@ void setup() {
 }
 
 void loop() {
+
+  lcd.clear();
   int sel_option = options_page();
+  lcd.clear();
+  switch (sel_option) {
+    delay(100);
+    case PAGE_CHNA:
+      Serial.println("Launching CHNA page");
+      page_chnA();
+      break;
+
+    default:
+      break;
+  }
 }
