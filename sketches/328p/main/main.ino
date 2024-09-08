@@ -165,14 +165,70 @@ byte bias_char[] = {
 bool switch_sel_status = 0;
 bool switch_mode_status = 0;
 
-bool was_clicked(int switch_sel) {
+void formatfloat(float num, int totalWidth, int precision, char* buffer) {
+    int integerPart = static_cast<int>(num);              // Extract integer part
+    float decimalPart = num - integerPart;                // Extract decimal part
+
+    
+    // Multiply decimal part to convert it into an integer (e.g., 0.34 -> 34)
+    for (int i = 0; i < precision; ++i) {
+        decimalPart *= 10;
+    }
+    
+    int decimalInt = static_cast<int>(decimalPart);       // Convert decimal to integer
+
+    // Convert integer and decimal parts into a single string manually
+    for (int i = 0; i < strlen(buffer); ++i) {
+        buffer[i] = '0';
+    }
+
+    int numDigits = 1;
+    if(integerPart != 0)
+       numDigits = floor(log10(integerPart) + 1);
+        
+
+    // Calculate the number of leading zeros needed
+    int leadingZeros = totalWidth - (numDigits + precision); 
+     
+    // Add leading zeros
+    for (int i = 0; i < leadingZeros; ++i) {
+        buffer[i] = '0';
+    }
+
+    // Add integer part to buffer
+    int index = leadingZeros;
+    int tempInt = integerPart;
+    if(tempInt != 0)
+      for (int i = numDigits - 1; i >= 0; --i) {
+          buffer[index + i] = '0' + (tempInt % 10);
+          tempInt /= 10;
+      }
+    index += numDigits;
+
+    // Add decimal point
+    buffer[index++] = '.';
+
+    // Add decimal part to buffer
+    tempInt = decimalInt;
+    if(decimalInt != 0)
+      for (int i = precision - 1; i >= 0; --i) {
+          buffer[index + i] = '0' + (tempInt % 10);
+          tempInt /= 10;
+      }
+
+    buffer[index + precision] = '\0';  // Null-terminate the string
+}
+
+bool was_clicked(int switch_sel, bool consume) {
   int switch_temp_status;
   if (switch_sel == SELECT_SW) {
     switch_temp_status = switch_sel_status;
-    switch_sel_status = 0;
+    if (consume)
+      switch_sel_status = 0;
   } else {
     switch_temp_status = switch_mode_status;
-    switch_mode_status = 0;
+    if (consume)
+      switch_mode_status = 0;
   }
   return switch_temp_status;
 }
@@ -211,7 +267,7 @@ int options_page() {
   rot_select_button.tick();
   rot_mode_button.tick();
 
-  while (!was_clicked(SELECT_SW)) {
+  while (!was_clicked(SELECT_SW, true)) {
     // put your main code here, to run repeatedly:
     unsigned char rselect_event = rselect.process();
     unsigned char rmode_event = rmode.process();
@@ -290,6 +346,9 @@ int options_page() {
       }
     }
   }
+  switch_sel_status = 0;
+  switch_mode_status = 0;
+
   Serial.println(option_selected);
   return option_selected;
 }
@@ -304,8 +363,10 @@ int options_page() {
 
 int lffreq_chna = 1000;
 float hffreq_chna = 1;
+bool chnA_Enable = true;
+int pwr_chna = 2;
+bool bias_chnA = false;
 void page_chnA() {
-  delay(700);
   lcd.clear();
   lcd.noCursor();
   lcd.setCursor(15, 1);
@@ -318,19 +379,40 @@ void page_chnA() {
   lcd.setCursor(0, 1);
   lcd.print(F(" 001.00Mhz E"));
 
+  lcd.setCursor(5, 0);
+  char lfreq_char[5];
+
+  sprintf(lfreq_char, "%04d", lffreq_chna);
+  lcd.print(lfreq_char);
+
+  lcd.setCursor(1, 1);
+  char hfreq_char[7];
+  dtostrf(hffreq_chna, 6, 2, hfreq_char);
+  for (int i = 0; i < 7; i++)
+    if (hfreq_char[i] == ' ')
+      hfreq_char[i] = '0';  // Replace space with zero
+  lcd.print(hfreq_char);
+
+  lcd.setCursor(11, 1);
+  chnA_Enable ? lcd.print("E") : lcd.print("D");
+
+  lcd.setCursor(13, 1);
+  bias_chnA ? lcd.print("B") : lcd.write(byte(BIAS_MENU));
+  ;
+
   rot_select_button.tick();
   rot_mode_button.tick();
   int option_selected = -1;
   int selected_character = 0;
 
+  lcd.setCursor(12, 0);
+  lcd.print(pwr_chna);
 
-  while (!(was_clicked(SELECT_SW) && option_selected == BACK_OPTION)) {
+
+  while (!(was_clicked(SELECT_SW, false) && option_selected == BACK_OPTION)) {
     // put your main code here, to run repeatedly:
     unsigned char rselect_event = rselect.process();
     unsigned char rmode_event = rmode.process();
-
-    rot_select_button.tick();
-    rot_mode_button.tick();
 
     //play sound
     if (rselect_event || rmode_event && buzz_duration > 0) {
@@ -339,9 +421,9 @@ void page_chnA() {
       digitalWrite(BUZZ_PIN, LOW);
     }
 
-    if (was_clicked(MODE_SW) && option_selected == CHN_HFFREQ) {
+    if (was_clicked(MODE_SW, false) && option_selected == CHN_HFFREQ) {
       ++selected_character;
-      if (selected_character==3)
+      if (selected_character == 3)
         ++selected_character;
 
       if (selected_character > 5)
@@ -349,6 +431,18 @@ void page_chnA() {
 
       lcd.setCursor(1 + selected_character, 1);
       lcd.cursor();
+    }
+
+    if (was_clicked(SELECT_SW, false) && option_selected == CHN_ENABLE) {
+      lcd.setCursor(11, 1);
+      chnA_Enable = !chnA_Enable;
+      chnA_Enable ? lcd.print("E") : lcd.print("D");
+    }
+
+    if (was_clicked(SELECT_SW, false) && option_selected == CHN_BIAS) {
+      lcd.setCursor(13, 1);
+      bias_chnA = !bias_chnA;
+      bias_chnA ? lcd.print("B") : lcd.write(byte(BIAS_MENU));
     }
 
     if (rselect_event) {
@@ -417,7 +511,6 @@ void page_chnA() {
             lffreq_chna = 0;
           if (lffreq_chna > 9999)
             lffreq_chna = 9999;
-          char lfreq_char[5];
           sprintf(lfreq_char, "%04d", lffreq_chna);
           lcd.print(lfreq_char);
           break;
@@ -433,12 +526,7 @@ void page_chnA() {
           if (hffreq_chna > 999.99)
             hffreq_chna = 999.99;
 
-          char hfreq_char[7];
-          dtostrf(hffreq_chna, 6, 2, hfreq_char);
-          for (int i = 0; i < 7; i++)
-            if (hfreq_char[i] == ' ')
-              hfreq_char[i] = '0';  // Replace space with zero
-
+          formatfloat(hffreq_chna, 5, 2, hfreq_char);
           lcd.print(hfreq_char);
           lcd.setCursor(1 + selected_character, 1);
           lcd.cursor();
@@ -450,8 +538,13 @@ void page_chnA() {
           break;
 
         case CHN_PWR:
-          lcd.setCursor(11, 0);
-          lcd.write(byte(RIGHT_ARW));
+          lcd.setCursor(12, 0);
+          rmode_event == DIR_CW ? pwr_chna += 2 : pwr_chna -= 2;
+          if (pwr_chna > 8)
+            pwr_chna = 2;
+          if (pwr_chna < 2)
+            pwr_chna = 8;
+          lcd.print(pwr_chna);
           break;
 
         case CHN_BIAS:
@@ -468,8 +561,518 @@ void page_chnA() {
           break;
       }
     }
+
+
+    switch_sel_status = 0;
+    switch_mode_status = 0;
+    rot_select_button.tick();
+    rot_mode_button.tick();
   }
+  switch_sel_status = 0;
+  switch_mode_status = 0;
 }
+
+
+#define OPTIONS_CHNB 4
+#define PWR_CHNB 3
+
+int lffreq_chnb = 1000;
+float hffreq_chnb = 1;
+bool chnB_Enable = true;
+int pwr_chnb = 2;
+bool bias_chnB = false;
+
+void page_chnB() {
+  lcd.clear();
+  lcd.noCursor();
+  lcd.setCursor(15, 1);
+  lcd.write(byte(BACK_MENU));
+
+  lcd.setCursor(0, 0);
+  lcd.print(F("CHNB 1000hz 2mA"));
+  lcd.setCursor(0, 1);
+  lcd.print(F(" 001.00Mhz E"));
+
+  lcd.setCursor(5, 0);
+  char lfreq_char[5];
+  sprintf(lfreq_char, "%04d", lffreq_chnb);
+  lcd.print(lfreq_char);
+
+  lcd.setCursor(1, 1);
+  char hfreq_char[7];
+  dtostrf(hffreq_chnb, 6, 2, hfreq_char);
+  for (int i = 0; i < 7; i++)
+    if (hfreq_char[i] == ' ')
+      hfreq_char[i] = '0';  // Replace space with zero
+  lcd.print(hfreq_char);
+
+  lcd.setCursor(11, 1);
+  chnB_Enable ? lcd.print("E") : lcd.print("D");
+
+
+  rot_select_button.tick();
+  rot_mode_button.tick();
+  int option_selected = -1;
+  int selected_character = 0;
+
+  lcd.setCursor(12, 0);
+  lcd.print(pwr_chnb);
+
+
+  while (!(was_clicked(SELECT_SW, false) && option_selected == BACK_OPTION)) {
+    // put your main code here, to run repeatedly:
+    unsigned char rselect_event = rselect.process();
+    unsigned char rmode_event = rmode.process();
+
+    //play sound
+    if (rselect_event || rmode_event && buzz_duration > 0) {
+      digitalWrite(BUZZ_PIN, HIGH);
+      delay(buzz_duration);
+      digitalWrite(BUZZ_PIN, LOW);
+    }
+
+    if (was_clicked(MODE_SW, false) && option_selected == CHN_HFFREQ) {
+      ++selected_character;
+      if (selected_character == 3)
+        ++selected_character;
+
+      if (selected_character > 5)
+        selected_character = 0;
+
+      lcd.setCursor(1 + selected_character, 1);
+      lcd.cursor();
+    }
+
+    if (was_clicked(SELECT_SW, false) && option_selected == CHN_ENABLE) {
+      lcd.setCursor(11, 1);
+      chnB_Enable = !chnB_Enable;
+      chnB_Enable ? lcd.print("E") : lcd.print("D");
+    }
+
+    if (rselect_event) {
+      rselect_event == DIR_CW ? option_selected++ : option_selected--;
+      if (option_selected < 0)
+        option_selected = OPTIONS_CHNB;
+      if (option_selected > OPTIONS_CHNB)
+        option_selected = 0;
+
+      lcd.noCursor();
+      lcd.setCursor(4, 0);
+      lcd.print(" ");
+      lcd.setCursor(0, 1);
+      lcd.print(" ");
+      lcd.setCursor(10, 1);
+      lcd.print(" ");
+      lcd.setCursor(12, 1);
+      lcd.print(" ");
+      lcd.setCursor(11, 0);
+      lcd.print(" ");
+
+      switch (option_selected) {
+        case CHN_LFFREQ:
+          lcd.setCursor(4, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case CHN_HFFREQ:
+          lcd.setCursor(0, 1);
+          lcd.write(byte(RIGHT_ARW));
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
+          break;
+
+        case CHN_ENABLE:
+          lcd.setCursor(10, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case PWR_CHNB:
+          lcd.setCursor(11, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+
+        case BACK_OPTION:
+          lcd.setCursor(15, 1);
+          lcd.cursor();
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    if (rmode_event) {
+      switch (option_selected) {
+        case CHN_LFFREQ:
+          lcd.setCursor(5, 0);
+          rmode_event == DIR_CW ? lffreq_chnb += 10 : lffreq_chnb -= 10;
+          if (lffreq_chnb < 0)
+            lffreq_chna = 0;
+          if (lffreq_chnb > 9999)
+            lffreq_chnb = 9999;
+          sprintf(lfreq_char, "%04d", lffreq_chnb);
+          lcd.print(lfreq_char);
+          break;
+
+        case CHN_HFFREQ:
+          lcd.setCursor(1, 1);
+          if (selected_character <= 2)
+            rmode_event == DIR_CW ? hffreq_chnb += pow(10, (2 - selected_character)) : hffreq_chnb -= pow(10, (2 - selected_character));
+          else
+            rmode_event == DIR_CW ? hffreq_chnb += pow(10, (3 - selected_character)) : hffreq_chnb -= pow(10, (3 - selected_character));
+          if (hffreq_chnb < 0)
+            hffreq_chna = 0;
+          if (hffreq_chnb > 999.99)
+            hffreq_chnb = 999.99;
+
+          formatfloat(hffreq_chnb, 5, 2, hfreq_char);
+          lcd.print(hfreq_char);
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
+          break;
+
+        case CHN_ENABLE:
+          lcd.setCursor(10, 1);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case PWR_CHNB:
+          lcd.setCursor(12, 0);
+          rmode_event == DIR_CW ? pwr_chnb += 2 : pwr_chnb -= 2;
+          if (pwr_chna > 8)
+            pwr_chna = 2;
+          if (pwr_chna < 2)
+            pwr_chna = 8;
+          lcd.print(pwr_chnb);
+          break;
+
+
+
+        case BACK_OPTION:
+          lcd.setCursor(15, 1);
+          lcd.cursor();
+          break;
+
+        default:
+          break;
+      }
+    }
+
+
+    switch_sel_status = 0;
+    switch_mode_status = 0;
+    rot_select_button.tick();
+    rot_mode_button.tick();
+  }
+  switch_sel_status = 0;
+  switch_mode_status = 0;
+}
+
+#define OPTIONS_CHNC 3
+#define DUTY_C 0
+#define FREQ_C 1
+#define ENABLE_C 2
+#define BACK_OPTION 3
+
+int duty_c = 50;
+float freq_c = 1000.120;  //khz
+bool enable_c = false;
+void page_chnC() {
+  lcd.clear();
+  lcd.noCursor();
+  lcd.setCursor(15, 1);
+  lcd.write(byte(BACK_MENU));
+  lcd.setCursor(0, 0);
+  lcd.print("PWM CHNC");
+  lcd.setCursor(9, 0);
+  lcd.print(duty_c);
+  lcd.print("%");
+  lcd.setCursor(9, 1);
+  lcd.print("Khz");
+
+  lcd.setCursor(14, 0);
+  enable_c ? lcd.print("E") : lcd.print("D");
+
+  lcd.setCursor(1, 1);
+  char hfreq_char[9];
+  char duty_char[3];
+  dtostrf(freq_c, 8, 3, hfreq_char);
+  for (int i = 0; i < 9; i++)
+    if (hfreq_char[i] == ' ')
+      hfreq_char[i] = '0';  // Replace space with zero
+  lcd.print(hfreq_char);
+
+  rot_select_button.tick();
+  rot_mode_button.tick();
+  int option_selected = -1;
+  int selected_character = 0;
+
+  while (!(was_clicked(SELECT_SW, false) && option_selected == BACK_OPTION)) {
+    // put your main code here, to run repeatedly:
+    unsigned char rselect_event = rselect.process();
+    unsigned char rmode_event = rmode.process();
+
+    //play sound
+    if (rselect_event || rmode_event && buzz_duration > 0) {
+      digitalWrite(BUZZ_PIN, HIGH);
+      delay(buzz_duration);
+      digitalWrite(BUZZ_PIN, LOW);
+    }
+
+    if (was_clicked(SELECT_SW, false) && option_selected == ENABLE_C) {
+       lcd.setCursor(14, 0);
+      enable_c = !enable_c;
+      enable_c ? lcd.print("E") : lcd.print("D");
+    }
+
+    if (was_clicked(MODE_SW, false) && option_selected == FREQ_C) {
+      ++selected_character;
+      if (selected_character == 4)
+        ++selected_character;
+
+      if (selected_character > 7)
+        selected_character = 0;
+
+      lcd.setCursor(1 + selected_character, 1);
+      lcd.cursor();
+    }
+
+
+    if (rselect_event) {
+      rselect_event == DIR_CW ? option_selected++ : option_selected--;
+      if (option_selected < 0)
+        option_selected = OPTIONS_CHNC;
+      if (option_selected > OPTIONS_CHNC)
+        option_selected = 0;
+
+      lcd.noCursor();
+      lcd.setCursor(0, 1);
+      lcd.print(" ");
+      lcd.setCursor(13, 0);
+      lcd.print(" ");
+      lcd.setCursor(8, 0);
+      lcd.print(" ");
+
+      switch (option_selected) {
+        case BACK_OPTION:
+          lcd.setCursor(15, 1);
+          lcd.cursor();
+          break;
+
+        case FREQ_C:
+          lcd.setCursor(0, 1);
+          lcd.write(byte(RIGHT_ARW));
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
+          break;
+
+        case ENABLE_C:
+          lcd.setCursor(13, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case DUTY_C:
+          lcd.setCursor(8, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+      }
+    }
+
+    if (rmode_event) {
+      switch (option_selected) {
+        case DUTY_C:
+          lcd.setCursor(9, 0);
+          rmode_event == DIR_CW ? duty_c++ : duty_c--;
+          if (duty_c < 2)
+            duty_c = 98;
+          if (duty_c > 98)
+            duty_c = 0;
+          sprintf(duty_char, "%02d", duty_c);
+          lcd.print(duty_char);
+          break;
+
+        case FREQ_C:
+          lcd.setCursor(1, 1);
+          if (selected_character <= 3)
+            rmode_event == DIR_CW ? freq_c += pow(10, (3 - selected_character)) : freq_c -= pow(10, (3 - selected_character));
+          else
+            rmode_event == DIR_CW ? freq_c += pow(10, (4 - selected_character)) : freq_c -= pow(10, (4 - selected_character));
+          if (freq_c < 0)
+            freq_c = 0;
+          if (freq_c > 9999.999)
+            freq_c = 9999.999;
+
+          dtostrf(freq_c, 7, 3, hfreq_char);
+          formatfloat(freq_c, 7, 3, hfreq_char);
+
+          lcd.print(hfreq_char);
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
+          break;
+      }
+    }
+
+
+    switch_sel_status = 0;
+    switch_mode_status = 0;
+    rot_select_button.tick();
+    rot_mode_button.tick();
+  }
+  switch_sel_status = 0;
+  switch_mode_status = 0;
+}
+
+
+
+int duty_d = 50;
+float freq_d = 1000.120;  //khz
+bool enable_d = false;
+void page_chnD() {
+  lcd.clear();
+  lcd.noCursor();
+  lcd.setCursor(15, 1);
+  lcd.write(byte(BACK_MENU));
+  lcd.setCursor(0, 0);
+  lcd.print("PWM CHND");
+  lcd.setCursor(9, 0);
+  lcd.print(duty_d);
+  lcd.print("%");
+  lcd.setCursor(9, 1);
+  lcd.print("Khz");
+
+  lcd.setCursor(14, 0);
+  enable_d ? lcd.print("E") : lcd.print("D");
+
+  lcd.setCursor(1, 1);
+  char hfreq_char[9];
+  char duty_char[3];
+  dtostrf(freq_d, 8, 3, hfreq_char);
+  for (int i = 0; i < 9; i++)
+    if (hfreq_char[i] == ' ')
+      hfreq_char[i] = '0';  // Replace space with zero
+  lcd.print(hfreq_char);
+
+  rot_select_button.tick();
+  rot_mode_button.tick();
+  int option_selected = -1;
+  int selected_character = 0;
+
+  while (!(was_clicked(SELECT_SW, false) && option_selected == BACK_OPTION)) {
+    // put your main code here, to run repeatedly:
+    unsigned char rselect_event = rselect.process();
+    unsigned char rmode_event = rmode.process();
+
+    //play sound
+    if (rselect_event || rmode_event && buzz_duration > 0) {
+      digitalWrite(BUZZ_PIN, HIGH);
+      delay(buzz_duration);
+      digitalWrite(BUZZ_PIN, LOW);
+    }
+
+    if (was_clicked(SELECT_SW, false) && option_selected == ENABLE_C) {
+       lcd.setCursor(14, 0);
+      enable_d = !enable_d;
+      enable_d ? lcd.print("E") : lcd.print("D");
+    }
+
+    if (was_clicked(MODE_SW, false) && option_selected == FREQ_C) {
+      ++selected_character;
+      if (selected_character == 4)
+        ++selected_character;
+
+      if (selected_character > 7)
+        selected_character = 0;
+
+      lcd.setCursor(1 + selected_character, 1);
+      lcd.cursor();
+    }
+
+
+    if (rselect_event) {
+      rselect_event == DIR_CW ? option_selected++ : option_selected--;
+      if (option_selected < 0)
+        option_selected = OPTIONS_CHNC;
+      if (option_selected > OPTIONS_CHNC)
+        option_selected = 0;
+
+      lcd.noCursor();
+      lcd.setCursor(0, 1);
+      lcd.print(" ");
+      lcd.setCursor(13, 0);
+      lcd.print(" ");
+      lcd.setCursor(8, 0);
+      lcd.print(" ");
+
+      switch (option_selected) {
+        case BACK_OPTION:
+          lcd.setCursor(15, 1);
+          lcd.cursor();
+          break;
+
+        case FREQ_C:
+          lcd.setCursor(0, 1);
+          lcd.write(byte(RIGHT_ARW));
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
+          break;
+
+        case ENABLE_C:
+          lcd.setCursor(13, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+
+        case DUTY_C:
+          lcd.setCursor(8, 0);
+          lcd.write(byte(RIGHT_ARW));
+          break;
+      }
+    }
+
+    if (rmode_event) {
+      switch (option_selected) {
+        case DUTY_C:
+          lcd.setCursor(9, 0);
+          rmode_event == DIR_CW ? duty_d++ : duty_d--;
+          if (duty_d < 2)
+            duty_d = 98;
+          if (duty_d > 98)
+            duty_d = 0;
+          sprintf(duty_char, "%02d", duty_d);
+          lcd.print(duty_char);
+          break;
+
+        case FREQ_C:
+          lcd.setCursor(1, 1);
+          if (selected_character <= 3)
+            rmode_event == DIR_CW ? freq_d += pow(10, (3 - selected_character)) : freq_d -= pow(10, (3 - selected_character));
+          else
+            rmode_event == DIR_CW ? freq_d += pow(10, (4 - selected_character)) : freq_d -= pow(10, (4 - selected_character));
+          if (freq_d < 0)
+            freq_d = 0;
+          if (freq_d > 9999.999)
+            freq_d = 9999.999;
+
+          dtostrf(freq_d, 7, 3, hfreq_char);
+          formatfloat(freq_d, 7, 3, hfreq_char);
+
+          lcd.print(hfreq_char);
+          lcd.setCursor(1 + selected_character, 1);
+          lcd.cursor();
+          break;
+      }
+    }
+
+
+    switch_sel_status = 0;
+    switch_mode_status = 0;
+    rot_select_button.tick();
+    rot_mode_button.tick();
+  }
+  switch_sel_status = 0;
+  switch_mode_status = 0;
+}
+
 
 void setup() {
   Serial.begin(9600);
@@ -525,10 +1128,20 @@ void loop() {
   int sel_option = options_page();
   lcd.clear();
   switch (sel_option) {
-    delay(100);
     case PAGE_CHNA:
-      Serial.println("Launching CHNA page");
       page_chnA();
+      break;
+
+    case PAGE_CHNB:
+      page_chnB();
+      break;
+
+    case PAGE_CHNC:
+      page_chnC();
+      break;
+    
+    case PAGE_CHND:
+      page_chnD();
       break;
 
     default:
