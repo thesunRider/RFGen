@@ -2,8 +2,6 @@
 #include <LiquidCrystal.h>
 #include <Rotary.h>
 #include <si5351mcu.h>
-
-
 #include <EButton.h>
 
 /*
@@ -32,8 +30,8 @@ A2,A1,A0
 
 #define BIAS_PIN 9
 #define BUZZ_PIN A3
-#define PWM_PIN1 3
-#define PWM_PIN2 10
+#define PWM_PIN2 3
+#define PWM_PIN1 10
 
 #define ROT_SELECT_CLK A0
 #define ROT_SELECT_DT A1
@@ -165,58 +163,58 @@ byte bias_char[] = {
 bool switch_sel_status = 0;
 bool switch_mode_status = 0;
 
-void formatfloat(float num, int totalWidth, int precision, char* buffer) {
-    int integerPart = static_cast<int>(num);              // Extract integer part
-    float decimalPart = num - integerPart;                // Extract decimal part
+void formatfloat(float num, int totalWidth, int precision, char *buffer) {
+  int integerPart = static_cast<int>(num);  // Extract integer part
+  float decimalPart = num - integerPart;    // Extract decimal part
 
-    
-    // Multiply decimal part to convert it into an integer (e.g., 0.34 -> 34)
-    for (int i = 0; i < precision; ++i) {
-        decimalPart *= 10;
+
+  // Multiply decimal part to convert it into an integer (e.g., 0.34 -> 34)
+  for (int i = 0; i < precision; ++i) {
+    decimalPart *= 10;
+  }
+
+  int decimalInt = static_cast<int>(decimalPart);  // Convert decimal to integer
+
+  // Convert integer and decimal parts into a single string manually
+  for (int i = 0; i < strlen(buffer); ++i) {
+    buffer[i] = '0';
+  }
+
+  int numDigits = 1;
+  if (integerPart != 0)
+    numDigits = floor(log10(integerPart) + 1);
+
+
+  // Calculate the number of leading zeros needed
+  int leadingZeros = totalWidth - (numDigits + precision);
+
+  // Add leading zeros
+  for (int i = 0; i < leadingZeros; ++i) {
+    buffer[i] = '0';
+  }
+
+  // Add integer part to buffer
+  int index = leadingZeros;
+  int tempInt = integerPart;
+  if (tempInt != 0)
+    for (int i = numDigits - 1; i >= 0; --i) {
+      buffer[index + i] = '0' + (tempInt % 10);
+      tempInt /= 10;
     }
-    
-    int decimalInt = static_cast<int>(decimalPart);       // Convert decimal to integer
+  index += numDigits;
 
-    // Convert integer and decimal parts into a single string manually
-    for (int i = 0; i < strlen(buffer); ++i) {
-        buffer[i] = '0';
+  // Add decimal point
+  buffer[index++] = '.';
+
+  // Add decimal part to buffer
+  tempInt = decimalInt;
+  if (decimalInt != 0)
+    for (int i = precision - 1; i >= 0; --i) {
+      buffer[index + i] = '0' + (tempInt % 10);
+      tempInt /= 10;
     }
 
-    int numDigits = 1;
-    if(integerPart != 0)
-       numDigits = floor(log10(integerPart) + 1);
-        
-
-    // Calculate the number of leading zeros needed
-    int leadingZeros = totalWidth - (numDigits + precision); 
-     
-    // Add leading zeros
-    for (int i = 0; i < leadingZeros; ++i) {
-        buffer[i] = '0';
-    }
-
-    // Add integer part to buffer
-    int index = leadingZeros;
-    int tempInt = integerPart;
-    if(tempInt != 0)
-      for (int i = numDigits - 1; i >= 0; --i) {
-          buffer[index + i] = '0' + (tempInt % 10);
-          tempInt /= 10;
-      }
-    index += numDigits;
-
-    // Add decimal point
-    buffer[index++] = '.';
-
-    // Add decimal part to buffer
-    tempInt = decimalInt;
-    if(decimalInt != 0)
-      for (int i = precision - 1; i >= 0; --i) {
-          buffer[index + i] = '0' + (tempInt % 10);
-          tempInt /= 10;
-      }
-
-    buffer[index + precision] = '\0';  // Null-terminate the string
+  buffer[index + precision] = '\0';  // Null-terminate the string
 }
 
 bool was_clicked(int switch_sel, bool consume) {
@@ -776,7 +774,8 @@ void page_chnB() {
 #define BACK_OPTION 3
 
 int duty_c = 50;
-float freq_c = 1000.120;  //khz
+float freq_c = 1;  //khz
+unsigned long freq_apply_c = freq_c;
 bool enable_c = false;
 void page_chnC() {
   lcd.clear();
@@ -793,6 +792,13 @@ void page_chnC() {
 
   lcd.setCursor(14, 0);
   enable_c ? lcd.print("E") : lcd.print("D");
+
+  if (enable_c) {
+    freq_apply_c = 1000 * freq_c;
+    FastPwmPin::enablePwmPin(PWM_PIN1, freq_apply_c, duty_c);
+  } else {
+    digitalWrite(PWM_PIN1, HIGH);
+  }
 
   lcd.setCursor(1, 1);
   char hfreq_char[9];
@@ -821,9 +827,16 @@ void page_chnC() {
     }
 
     if (was_clicked(SELECT_SW, false) && option_selected == ENABLE_C) {
-       lcd.setCursor(14, 0);
+      lcd.setCursor(14, 0);
       enable_c = !enable_c;
       enable_c ? lcd.print("E") : lcd.print("D");
+
+      if (enable_c) {
+        freq_apply_c = 1000 * freq_c;
+        FastPwmPin::enablePwmPin(PWM_PIN1, freq_apply_c, duty_c);
+      } else {
+        digitalWrite(PWM_PIN1, HIGH);
+      }
     }
 
     if (was_clicked(MODE_SW, false) && option_selected == FREQ_C) {
@@ -890,6 +903,12 @@ void page_chnC() {
             duty_c = 0;
           sprintf(duty_char, "%02d", duty_c);
           lcd.print(duty_char);
+          if (enable_c) {
+            freq_apply_c = 1000 * freq_c;
+            FastPwmPin::enablePwmPin(PWM_PIN1, freq_apply_c, duty_c);
+          } else {
+            digitalWrite(PWM_PIN1, HIGH);
+          }
           break;
 
         case FREQ_C:
@@ -909,6 +928,14 @@ void page_chnC() {
           lcd.print(hfreq_char);
           lcd.setCursor(1 + selected_character, 1);
           lcd.cursor();
+
+          if (enable_c) {
+            freq_apply_c = 1000 * freq_c;
+            FastPwmPin::enablePwmPin(PWM_PIN1, freq_apply_c, duty_c);
+          } else {
+            digitalWrite(PWM_PIN1, HIGH);
+          }
+
           break;
       }
     }
@@ -926,7 +953,8 @@ void page_chnC() {
 
 
 int duty_d = 50;
-float freq_d = 1000.120;  //khz
+float freq_d = 1;  //khz
+unsigned long freq_apply_d = freq_d;
 bool enable_d = false;
 void page_chnD() {
   lcd.clear();
@@ -943,6 +971,13 @@ void page_chnD() {
 
   lcd.setCursor(14, 0);
   enable_d ? lcd.print("E") : lcd.print("D");
+
+  if (enable_d) {
+    freq_apply_d = 1000 * freq_d;
+    FastPwmPin::enablePwmPin(PWM_PIN2, freq_apply_d, duty_d);
+  } else {
+    digitalWrite(PWM_PIN2, HIGH);
+  }
 
   lcd.setCursor(1, 1);
   char hfreq_char[9];
@@ -971,9 +1006,16 @@ void page_chnD() {
     }
 
     if (was_clicked(SELECT_SW, false) && option_selected == ENABLE_C) {
-       lcd.setCursor(14, 0);
+      lcd.setCursor(14, 0);
       enable_d = !enable_d;
       enable_d ? lcd.print("E") : lcd.print("D");
+
+      if (enable_d) {
+        freq_apply_d = 1000 * freq_d;
+        FastPwmPin::enablePwmPin(PWM_PIN2, freq_apply_d, duty_d);
+      } else {
+        digitalWrite(PWM_PIN2, HIGH);
+      }
     }
 
     if (was_clicked(MODE_SW, false) && option_selected == FREQ_C) {
@@ -1040,6 +1082,12 @@ void page_chnD() {
             duty_d = 0;
           sprintf(duty_char, "%02d", duty_d);
           lcd.print(duty_char);
+          if (enable_d) {
+            freq_apply_d = 1000 * freq_d;
+            FastPwmPin::enablePwmPin(PWM_PIN2, freq_apply_d, duty_d);
+          } else {
+            digitalWrite(PWM_PIN2, HIGH);
+          }
           break;
 
         case FREQ_C:
@@ -1059,6 +1107,12 @@ void page_chnD() {
           lcd.print(hfreq_char);
           lcd.setCursor(1 + selected_character, 1);
           lcd.cursor();
+          if (enable_d) {
+            freq_apply_d = 1000 * freq_d;
+            FastPwmPin::enablePwmPin(PWM_PIN2, freq_apply_d, duty_d);
+          } else {
+            digitalWrite(PWM_PIN2, HIGH);
+          }
           break;
       }
     }
@@ -1139,7 +1193,7 @@ void loop() {
     case PAGE_CHNC:
       page_chnC();
       break;
-    
+
     case PAGE_CHND:
       page_chnD();
       break;
