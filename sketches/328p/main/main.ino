@@ -24,8 +24,13 @@ A3 - buzz
 3 - pwm1
 10 - pwm2
 
-A2,A1,A0
-11,12,13
+A0 - rots_clk
+A1 - rots_dt
+A2 - rots_sw
+
+12 - rotm_clk
+11 - rotm_dt
+13 - rotm_sw
 */
 
 #define BIAS_PIN 9
