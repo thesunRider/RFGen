@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Footprints")(type "KiCad")(uri "C:/Users/Surya/Documents/projects/electronics/labrfgen/RFGen/hardware_design/Kicad-STM32/Footprints")(options "")(descr ""))
+)
