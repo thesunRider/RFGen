@@ -11,7 +11,9 @@ This is an open source DIY Square wave generator. There are two versions include
 
 ### Schematics:
 
+Arduino version
 ![arduino](assets/arduino_ver.png)
+Bluepill version
 ![bluepill](assets/bluepill_ver.png)
 
 - Si5351 - Channel A,B (1Khz - 250Mhz)
