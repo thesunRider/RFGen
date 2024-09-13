@@ -1,4 +1,4 @@
-23668211631981896
+23685472486662303
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -56930,6 +56930,76 @@ emi filter
 0
 5
 5
+Footprints
+YAAJ_BlackPill_1
+BlackPill module with pin headers and sockets. No SWD breakout
+module BlackPill Black Pill header socket
+0
+34
+34
+Footprints
+YAAJ_BlackPill_2
+BlackPill module with pin headers / sockets. No SWD breakout
+module BlackPill Black Pill header
+0
+34
+34
+Footprints
+YAAJ_BlackPill_SWD_1
+BlackPill module with pin headers / sockets. SWD broken out to PCB.
+module BlackPill Black Pill header SWD breakout
+0
+38
+38
+Footprints
+YAAJ_BlackPill_SWD_2
+BlackPill module with pin headers / sockets. SWD broken out to PCB.
+module BlackPill Black Pill header SWD breakout
+0
+38
+38
+Footprints
+YAAJ_BluePill_1
+Through hole headers for BluePill module. No SWD breakout. Fancy silkscreen.
+module BlluePill Blue Pill header SWD breakout
+0
+40
+40
+Footprints
+YAAJ_BluePill_2
+Through hole headers for BluePill module. No SWD breakout. Fancy silkscreen.
+module BlluePill Blue Pill header SWD breakout
+0
+40
+40
+Footprints
+YAAJ_BluePill_SWD_1
+Through hole headers for BluePill module. No SWD breakout. Fancy silkscreen.
+module BlluePill Blue Pill header SWD breakout
+0
+44
+44
+Footprints
+YAAJ_BluePill_SWD_2
+Through hole headers for BluePill module. No SWD breakout. Fancy silkscreen.
+module BlluePill Blue Pill header SWD breakout
+0
+44
+44
+Footprints
+YAAJ_WeAct_BlackPill_2
+Through hole headers for BluePill module. No SWD breakout. Fancy silkscreen.
+module BlluePill Blue Pill header SWD breakout
+0
+40
+40
+Footprints
+YAAJ_WeAct_BlackPill_SWD_2
+Through hole headers for BluePill module. No SWD breakout. Fancy silkscreen.
+module BlluePill Blue Pill header SWD breakout
+0
+44
+44
 Fuse
 FuseHolder_Blade_ATO_Littelfuse_FLR_178.6165
 Littelfuse fuse holder for ATO/FKS blade fuses, 80V, vertical, 20 x 6mm, PCB thickness up to 1.5mm, http://www.littelfuse.com/~/media/commercial-vehicle/datasheets/automotive-fuse-holders/ato/littelfuse-fuse-holder-ato-flr-pcb-datasheet.pdf
