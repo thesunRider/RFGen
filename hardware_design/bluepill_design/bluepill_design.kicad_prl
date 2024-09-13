@@ -74,7 +74,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "labRF.kicad_prl",
+    "filename": "bluepill_design.kicad_prl",
     "version": 3
   },
   "project": {
