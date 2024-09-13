@@ -9,7 +9,10 @@ This is an open source DIY Square wave generator. There are two versions include
 - Blue pill - (1Hz - 960Mhz)
 - Atmega328p/Arduino (1Hz - 250Mhz)
 
-### Hardware required:
+### Schematics:
+
+![arduino](assets/arduino_ver.png)
+![bluepill](assets/bluepill_ver.png)
 
 - Si5351 - Channel A,B (1Khz - 250Mhz)
 - CMT2119A - Channel E (only for bluepill version: 250Mhz - 960Mhz)
