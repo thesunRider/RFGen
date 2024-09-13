@@ -39,14 +39,4 @@ Supply 9V on the power input, this is regulated to 5v by l7805
 
 # Development
 
-
 To program a soldered bluepill via USB kindly power off the device before connecting the USB. SInce UART pins are exposed you can program it via those headers too.
-
-
-# Contribute
-
-
-You can use this section to highlight how people can contribute to your project.
-
-You can add information on how they can open issues or how they can sponsor the project.
-
