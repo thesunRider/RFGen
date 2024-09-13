@@ -369,6 +369,7 @@ float hffreq_chna = 1;
 bool chnA_Enable = true;
 int pwr_chna = 2;
 bool bias_chnA = false;
+unsigned long chna_freq = 1000;
 void page_chnA() {
   lcd.clear();
   lcd.noCursor();
@@ -401,7 +402,6 @@ void page_chnA() {
 
   lcd.setCursor(13, 1);
   bias_chnA ? lcd.print("B") : lcd.write(byte(BIAS_MENU));
-  ;
 
   rot_select_button.tick();
   rot_mode_button.tick();
@@ -440,12 +440,14 @@ void page_chnA() {
       lcd.setCursor(11, 1);
       chnA_Enable = !chnA_Enable;
       chnA_Enable ? lcd.print("E") : lcd.print("D");
+       chnA_Enable ? Si.enable(0) : Si.disable(0);
     }
 
     if (was_clicked(SELECT_SW, false) && option_selected == CHN_BIAS) {
       lcd.setCursor(13, 1);
       bias_chnA = !bias_chnA;
       bias_chnA ? lcd.print("B") : lcd.write(byte(BIAS_MENU));
+      bias_chnA?digitalWrite(BIAS_PIN,HIGH):digitalWrite(BIAS_PIN,LOW);
     }
 
     if (rselect_event) {
@@ -516,6 +518,12 @@ void page_chnA() {
             lffreq_chna = 9999;
           sprintf(lfreq_char, "%04d", lffreq_chna);
           lcd.print(lfreq_char);
+
+          if (chnA_Enable) {
+            chna_freq = lffreq_chna + hffreq_chna;
+            Si.setFreq(0, chna_freq);
+            Si.enable(0);
+          }
           break;
 
         case CHN_HFFREQ:
@@ -533,6 +541,12 @@ void page_chnA() {
           lcd.print(hfreq_char);
           lcd.setCursor(1 + selected_character, 1);
           lcd.cursor();
+
+          if (chnA_Enable) {
+            chna_freq = lffreq_chna + hffreq_chna;
+            Si.setFreq(0, chna_freq);
+            Si.enable(0);
+          }
           break;
 
         case CHN_ENABLE:
@@ -548,6 +562,15 @@ void page_chnA() {
           if (pwr_chna < 2)
             pwr_chna = 8;
           lcd.print(pwr_chna);
+          if (pwr_chna == 2) {
+            Si.setPower(0, SIOUT_2mA);
+          } else if (pwr_chna == 4) {
+            Si.setPower(0, SIOUT_4mA);
+          } else if (pwr_chna == 6) {
+            Si.setPower(0, SIOUT_6mA);
+          } else if (pwr_chna == 8) {
+            Si.setPower(0, SIOUT_8mA);
+          }
           break;
 
         case CHN_BIAS:
@@ -584,7 +607,7 @@ float hffreq_chnb = 1;
 bool chnB_Enable = true;
 int pwr_chnb = 2;
 bool bias_chnB = false;
-
+unsigned long chnb_freq = 1000;
 void page_chnB() {
   lcd.clear();
   lcd.noCursor();
@@ -650,6 +673,7 @@ void page_chnB() {
       lcd.setCursor(11, 1);
       chnB_Enable = !chnB_Enable;
       chnB_Enable ? lcd.print("E") : lcd.print("D");
+      chnB_Enable ? Si.enable(2) : Si.disable(2);
     }
 
     if (rselect_event) {
@@ -711,11 +735,16 @@ void page_chnB() {
           lcd.setCursor(5, 0);
           rmode_event == DIR_CW ? lffreq_chnb += 10 : lffreq_chnb -= 10;
           if (lffreq_chnb < 0)
-            lffreq_chna = 0;
+            lffreq_chnb = 0;
           if (lffreq_chnb > 9999)
             lffreq_chnb = 9999;
           sprintf(lfreq_char, "%04d", lffreq_chnb);
           lcd.print(lfreq_char);
+          if (chnB_Enable) {
+            chnb_freq = lffreq_chnb + hffreq_chnb;
+            Si.setFreq(2, chnb_freq);
+            Si.enable(2);
+          }
           break;
 
         case CHN_HFFREQ:
@@ -725,7 +754,7 @@ void page_chnB() {
           else
             rmode_event == DIR_CW ? hffreq_chnb += pow(10, (3 - selected_character)) : hffreq_chnb -= pow(10, (3 - selected_character));
           if (hffreq_chnb < 0)
-            hffreq_chna = 0;
+            hffreq_chnb = 0;
           if (hffreq_chnb > 999.99)
             hffreq_chnb = 999.99;
 
@@ -733,6 +762,12 @@ void page_chnB() {
           lcd.print(hfreq_char);
           lcd.setCursor(1 + selected_character, 1);
           lcd.cursor();
+          if (chnB_Enable) {
+            chnb_freq = lffreq_chnb + hffreq_chnb;
+            Si.setFreq(2, chnb_freq);
+            Si.enable(2);
+          }
+
           break;
 
         case CHN_ENABLE:
@@ -743,11 +778,21 @@ void page_chnB() {
         case PWR_CHNB:
           lcd.setCursor(12, 0);
           rmode_event == DIR_CW ? pwr_chnb += 2 : pwr_chnb -= 2;
-          if (pwr_chna > 8)
-            pwr_chna = 2;
-          if (pwr_chna < 2)
-            pwr_chna = 8;
+          if (pwr_chnb > 8)
+            pwr_chnb = 2;
+          if (pwr_chnb < 2)
+            pwr_chnb = 8;
           lcd.print(pwr_chnb);
+          if (pwr_chnb == 2) {
+            Si.setPower(2, SIOUT_2mA);
+          } else if (pwr_chnb == 4) {
+            Si.setPower(2, SIOUT_4mA);
+          } else if (pwr_chnb == 6) {
+            Si.setPower(2, SIOUT_6mA);
+          } else if (pwr_chnb == 8) {
+            Si.setPower(2, SIOUT_8mA);
+          }
+
           break;
 
 
@@ -1167,7 +1212,7 @@ void setup() {
   rmode.begin(true);
 
   Si.init();
-
+  Si.reset();
   rot_select_button.attachSingleClick(click_select);
   rot_mode_button.attachSingleClick(click_mode);
 
@@ -1175,6 +1220,7 @@ void setup() {
   delay(SPLASH_DELAY);
   digitalWrite(BUZZ_PIN, LOW);
   lcd.clear();
+
 
 
   // put your setup code here, to run once:
