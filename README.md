@@ -16,7 +16,7 @@ This is an open source DIY Square wave generator. There are two versions include
 
 
 # Installation
-[(Back to top)](#table-of-contents)
+
 
 - Upload 328p schematics for an Arduino based generator.
 - Upload bluepill schematic for Bluepilll based generator.
@@ -25,7 +25,7 @@ This is an open source DIY Square wave generator. There are two versions include
 
 
 # Usage
-[(Back to top)](#table-of-contents)
+
 
 There is a bias tee included for these channels whose bias can be adjusted by the attached external potentiometer. 
 
@@ -33,13 +33,13 @@ Supply 9V on the power input, this is regulated to 5v by l7805
 
 
 # Development
-[(Back to top)](#table-of-contents)
+
 
 To program a soldered bluepill via USB kindly power off the device before connecting the USB. SInce UART pins are exposed you can program it via those headers too.
 
 
 # Contribute
-[(Back to top)](#table-of-contents)
+
 
 You can use this section to highlight how people can contribute to your project.
 
