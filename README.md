@@ -21,9 +21,8 @@ Bluepill version
 
 # Demo
 ![arduino](assets/demo_hardware.png)
-Demo Video /
-
-![arduino](assets/demo_small.mp4)
+Demo Video 
+![arduino]((https://raw.githubusercontent.com/thesunRider/RFGen/main/assets/demo_small.mp4))
 
 # Installation
 
