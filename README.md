@@ -23,7 +23,8 @@ Bluepill version
 ![arduino](assets/demo_hardware.png)
 Demo Video 
 
-https://github.com/user-attachments/assets/9aa5d9d8-7f03-4611-9744-de475578615f
+https://github.com/user-attachments/assets/bd40d5bd-5a4e-4a5a-9730-a542df9f6650
+
 
 
 
