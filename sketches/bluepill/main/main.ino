@@ -4,13 +4,16 @@
 #include "STM32_PWM.h"
 #define boolean bool
 
-#include <SimpleTimer.h>  // https://github.com/jfturcot/SimpleTimer
 #define HW_TIMER_INTERVAL_US 10L
 
 #include <LiquidCrystal.h>
 #include <Rotary.h>
 #include <si5351mcu.h>
 #include <EButton.h>
+
+#include "src/RFM119/HopeDuino_CMT211xA.h"
+
+
 
 /*
 1   2   3   4   5
@@ -164,6 +167,66 @@ byte bias_char[] = {
   B10101,
   B11001,
   B00000
+};
+
+cmt211xaClass radio;
+
+byte str[31] = {
+  0xAA,
+  0xAA,
+  0xAA,
+  0xAA,
+  0xAA,
+  0xAA,
+  0xAA,
+  0xAA,
+  0x2D,
+  0xD4,
+  'H',
+  'o',
+  'p',
+  'e',
+  'R',
+  'F',
+  ' ',
+  'R',
+  'F',
+  'M',
+  ' ',
+  'C',
+  'O',
+  'B',
+  'R',
+  'F',
+  'M',
+  '1',
+  '1',
+  '9',
+  'S',
+};
+
+word CfgTbl[21] = {
+0x007F,
+0x5000,
+0x0000,
+0x0000,
+0x0000,
+0xF000,
+0x0000,
+0xBB13,
+0x4200,
+0x0000,
+0x2401,
+0x01B0,
+0x8000,
+0x0006,
+0xFFFF,
+0x0020,
+0x5F1E,
+0x22D6,
+0x0E13,
+0x0019,
+0x2000,
 };
 
 PinName pinNameToUse_PWM1 = digitalPinToPinName(PWM_PIN1);
@@ -1225,6 +1288,11 @@ void setup() {
 
   lcd.begin(16, 2);
   // Print a message to the LCD.
+  
+  radio.Chipset = CMT2119A;
+  radio.SymbolTime = 416;
+  radio.vCMT2119AInit(CfgTbl, 21, 245000000UL, 10000UL, 0);
+
 
   lcd.createChar(LEFT_OPT, left_options);
   lcd.createChar(RIGHT_OPT, right_options);

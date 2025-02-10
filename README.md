@@ -19,6 +19,11 @@ Bluepill version
 - Si5351 - Channel A,B (1Khz - 250Mhz)
 - CMT2119A - Channel E (only for bluepill version: 250Mhz - 960Mhz)
 
+# Demo
+![arduino](assets/demo_hardware.png)
+Demo Video /
+
+![arduino](assets/demo_small.mp4)
 
 # Installation
 

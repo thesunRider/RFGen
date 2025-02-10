@@ -1,0 +1,155 @@
+[33mcommit acf8d5e7652fd5a40decad964612db6c70ea38ec[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Mon Feb 10 21:09:18 2025 +0100
+
+    Added demo video
+
+[33mcommit 0a1c87bc33a168fffb97713bd12723cb16d81799[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Mon Feb 10 21:06:01 2025 +0100
+
+    Added demo video
+
+[33mcommit df74dae5b420a0e70c1a34926e85f3e004318bd2[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 13:14:20 2024 +0530
+
+    Added blue pill code
+
+[33mcommit 457405473728e810110015d86ce0a880b819ca99[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 03:08:43 2024 +0530
+
+    Linted 328p code
+
+[33mcommit 9fecf4d17ffce6031f3ead5bebfd08b386ef26b4[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 02:06:33 2024 +0530
+
+    Updated Readme
+
+[33mcommit c7ff8f4618a666a15bdfe726737265f34c1aa56b[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 02:05:35 2024 +0530
+
+    Updated Readme
+
+[33mcommit 7ee50e6e265528c579d25088c6bb5c03526abaed[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 02:04:55 2024 +0530
+
+    Updated Readme
+
+[33mcommit 95753d0728fa4f804081fe5205749525e0aaf724[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 02:00:47 2024 +0530
+
+    Updated Readme
+
+[33mcommit 707dc3c3af681f322443d16812f909fc47f8dfdd[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 02:00:13 2024 +0530
+
+    Updated Readme
+
+[33mcommit 960bc62188956171642f0583c1cbe97cd0c7a189[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 00:43:47 2024 +0530
+
+    Organised sections and uploaded schematics
+
+[33mcommit 2776ee901eb1493ae9c569151710282e32ceaa94[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 00:37:03 2024 +0530
+
+    Finished bluepill schematics
+
+[33mcommit c3c288be84d5f89380dff3e009a8c993a3898a00[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 14 00:36:42 2024 +0530
+
+    Finished bluepill schematics
+
+[33mcommit 668942c653d0d05c0fa61c2935a00cc4a5f6cd56[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Fri Sep 13 02:36:15 2024 +0530
+
+    Upgraded Schematic to 9V reference
+
+[33mcommit e9d7919b1a6b991b89a41dd74ebc53afd9449b35[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Thu Sep 12 01:15:41 2024 +0530
+
+    Finieshed PCB Design
+
+[33mcommit 3d2e256bce9ccf7fd2f77fff3ce79d600dd374e0[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Thu Sep 12 01:05:20 2024 +0530
+
+    Finieshed PCB Design
+
+[33mcommit f5d3b491875b344160b7ed73086cd0ca4cfcef02[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Wed Sep 11 03:40:51 2024 +0530
+
+    328p schematics added
+
+[33mcommit 28f78b03f0d4261accbd384b1ec45f08d3365b37[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Wed Sep 11 01:34:29 2024 +0530
+
+    Added main adjusters
+
+[33mcommit aa425f2f4b5704b897a8f7a1d31346b6049437e1[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sun Sep 8 21:39:41 2024 +0530
+
+    Finished to Channel D
+
+[33mcommit 63c31476bceccd1943fa333ec5cfbeca2df5bd7e[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 7 05:02:27 2024 +0530
+
+    added freq adjuster main
+
+[33mcommit 4597c9aca7b38ad440be8f114e070a81f2f6f4d1[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Sat Sep 7 03:44:32 2024 +0530
+
+    added freq adjuster
+
+[33mcommit f387af8e7f9716e59c364ab10ed3526b361107a0[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Thu Sep 5 03:54:41 2024 +0530
+
+    added main menu
+
+[33mcommit 367c9acf772d7e340da1210c8c714adfb0f4c4c2[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Thu Sep 5 03:51:22 2024 +0530
+
+    added main menu
+
+[33mcommit e2658225918d654a58824cd9697d10476c2e474f[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Thu Sep 5 00:59:58 2024 +0530
+
+    added inits
+
+[33mcommit 568acc70bf40807995ea749ab453f51bd4cf361f[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Wed Sep 4 21:21:11 2024 +0530
+
+    created main 328p sketch
+
+[33mcommit de62ef82fcca52f9c9a519ca0c943f154fa3b6d3[m
+Author: unknown <suryasaradhi3@gmail.com>
+Date:   Wed Sep 4 21:19:49 2024 +0530
+
+    Added Tests
+
+[33mcommit dffcb0c4c7843f74d35d1541b576769d7f2fe7d8[m
+Author: suryasaradhi <suryasaradhi3@gmail.com>
+Date:   Wed May 29 00:59:05 2024 +0530
+
+    Initial commit

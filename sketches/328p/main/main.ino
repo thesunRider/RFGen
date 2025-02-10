@@ -520,7 +520,7 @@ void page_chnA() {
           lcd.print(lfreq_char);
 
           if (chnA_Enable) {
-            chna_freq = lffreq_chna + hffreq_chna;
+            chna_freq = lffreq_chna + hffreq_chna*1000000;
             Si.setFreq(0, chna_freq);
             Si.enable(0);
           }
@@ -543,7 +543,7 @@ void page_chnA() {
           lcd.cursor();
 
           if (chnA_Enable) {
-            chna_freq = lffreq_chna + hffreq_chna;
+            chna_freq = lffreq_chna + hffreq_chna*1000000;
             Si.setFreq(0, chna_freq);
             Si.enable(0);
           }
@@ -741,7 +741,7 @@ void page_chnB() {
           sprintf(lfreq_char, "%04d", lffreq_chnb);
           lcd.print(lfreq_char);
           if (chnB_Enable) {
-            chnb_freq = lffreq_chnb + hffreq_chnb;
+            chnb_freq = lffreq_chnb + hffreq_chnb*1000000;
             Si.setFreq(2, chnb_freq);
             Si.enable(2);
           }
@@ -763,7 +763,7 @@ void page_chnB() {
           lcd.setCursor(1 + selected_character, 1);
           lcd.cursor();
           if (chnB_Enable) {
-            chnb_freq = lffreq_chnb + hffreq_chnb;
+            chnb_freq = lffreq_chnb + hffreq_chnb*1000000;
             Si.setFreq(2, chnb_freq);
             Si.enable(2);
           }
